@@ -1,0 +1,6 @@
+open
+open only
+close
+close all
+loop
+temperature
