@@ -1,0 +1,219 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jul 21 15:05:52 2022
+
+@author: asc-kawakamigroup-jjgregory
+
+"""
+# Challenge: Create an interactive GUI that contains a graph plot of
+# temperature vs. time, setpoint vs. time, setpoint adjustment buttons, and
+# ramp rate adjustment buttons. 
+
+# Key steps: read the devices in fixed time intervals (x), update data array
+# (y -- temp and z -- setpoint), plot all
+
+# Brainstorming buttons/code:
+    # Generate graph from time frame
+    # Graph analytics window???
+    # Working output updates (Likely on graph frame)
+    # store data in large list, reset list at 3AM. able to be pulled from
+    # code "flags" graph changes. ex. dips under SP creates flag w timestamp
+
+import sys
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.uic import loadUi
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+import numpy as np
+
+from matplotlib.figure import Figure
+import matplotlib.animation as animation
+from matplotlib.lines import Line2D
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import (NavigationToolbar2QT as 
+NavigationToolbar)
+
+import datetime as dt
+import random
+import time
+import threading
+import matplotlib
+matplotlib.use("Qt5Agg")
+
+from pyModbusTCP.client import ModbusClient
+
+""" initialize all Eurotherm clientele, Modbus addresses """
+if __name__ == '__main__':
+    c222 = ModbusClient(host='192.168.111.222', port=502, auto_open=True)
+    c223 = ModbusClient(host='192.168.111.223', port=502, auto_open=True)
+    c224 = ModbusClient(host='192.168.111.224', port=502, auto_open=True)
+    c225 = ModbusClient(host='192.168.111.225', port=502, auto_open=True)
+    
+    pv_addr = 289
+    sp_addr = 2
+    wo_addr = 4
+    sp_high_addr = 111
+    sp_low_addr = 112
+    rr1_addr = 1282
+    
+class MplWidget(QWidget):
+    def __init__(self, parent = None):
+        QWidget.__init__(self, parent)
+        self.canvas = FigureCanvas(Figure())
+    
+class MainWindow(QMainWindow):    
+    def __init__(self):
+        super(MainWindow, self).__init__()
+        loadUi(r'C:\Python\gui-files\eurotherm_gui.ui', self)
+        
+        # self.addToolBar(NavigationToolbar(self.MplWidget, self))
+        
+        """ all buttons and sliders here! """
+     
+        self.ChangeSP.clicked.connect(self.SPfunction) #setpoint button
+        self.ChangeRR.clicked.connect(self.RRfunction) #ramp rate button
+        
+        self.slider = self.findChild(QSlider, "zoomSlider") # zoom in/out slider
+        self.label = self.findChild(QLabel, "zoomVal") # zoom value text
+        self.slider.valueChanged.connect(self.slide_val) # changes zoom value text
+        self.slider.setTickPosition(QSlider.TicksBelow) #places ticks on slider
+        self.slider.setTickInterval(1) #tick interval every 1 positon
+      
+        # self.zoomin222.clicked.connect(self.zoomin222function) 
+        # self.zoomout222.clicked.connect(self.zoomout222function) 
+      
+        # self.zoomin223.clicked.connect(self.zoomin223function) 
+        # self.zoomout223.clicked.connect(self.zoomout223function)
+      
+        # self.zoomin224.clicked.connect(self.zoomin224function)
+        # self.zoomout224.clicked.connect(self.zoomout224function)
+      
+        # self.zoomin225.clicked.connect(self.zoomin225function)
+        # self.zoomout225.clicked.connect(self.zoomout225function)
+        
+        
+        """ display the initial SP/RR values in SpinBox UPON opening GUI """
+        
+        a = c222.read_holding_registers(sp_addr,1)[0]/10.0
+        b = c223.read_holding_registers(sp_addr,1)[0]/10.0
+        c = c224.read_holding_registers(sp_addr,1)[0]/10.0
+        d = c225.read_holding_registers(sp_addr,1)[0]/10.0
+        self.SPset222.setValue(a)
+        self.SPset223.setValue(b)
+        self.SPset224.setValue(c)
+        self.SPset225.setValue(d)
+        
+        e = c222.read_holding_registers(rr1_addr,1)[0]
+        f = c223.read_holding_registers(rr1_addr,1)[0]
+        g = c224.read_holding_registers(rr1_addr,1)[0]
+        h = c225.read_holding_registers(rr1_addr,1)[0]
+        self.RRset222.setValue(e)
+        self.RRset223.setValue(f)
+        self.RRset224.setValue(g)
+        self.RRset225.setValue(h)
+   
+    """ define button functions """
+    # def update_animation(self):
+    #    self.ani = animation.FuncAnimation(self.MplWidget, self.update_axes, 
+    #    self.update_graph, interval=1000, repeat=False)
+    #    self.MplWidget.canvas.draw()
+       
+    # def update_graph(self):
+    #     for k in range(1, 10):
+    #         fs = 500
+    #         f = random.randint(1, 100)
+    #         ts = 1 / fs
+    #         length_of_signal = 100
+    #         t = np.linspace(0, 1, length_of_signal)
+
+    #         cosinus_signal = np.cos(2 * np.pi * f * t)
+    #         sinus_signal = np.sin(2 * np.pi * f * t)
+    #         yield t, cosinus_signal, sinus_signal
+
+
+    # def update_axes(self, update):
+    #     t, cosinus_signal, sinus_signal = update[0], update[1], update[2]
+    #     self.MplWidget.canvas.axes.clear()
+    #     self.MplWidget.canvas.axes.plot(t, cosinus_signal)
+    #     self.MplWidget.canvas.axes.plot(t, sinus_signal)
+        
+    def versionDisplay(self):
+        # displays current version of matplotlib at bottom of screen
+        mpltv = matplotlib.__version__
+        vlabel = self.findChild(QLabel, f"matplotlib_version_txt")
+        vlabel.setText(f"Running Matplotlib Version {mpltv}")
+        
+    def slide_val(self, zvalue):
+        # changes the value of text when zoom slider is moved
+        self.label.setText(str(zvalue))
+         
+    def SPfunction(self):
+        # button updates all devices with new SP or does nothing for unchanaged vals
+        
+        a = self.SPset222.value() 
+        b = self.SPset223.value()
+        c = self.SPset224.value()
+        d = self.SPset225.value()
+        
+        c222.write_single_register(sp_addr,int(a*10.0))
+        c223.write_single_register(sp_addr,int(b*10.0))
+        c224.write_single_register(sp_addr,int(c*10.0))
+        c225.write_single_register(sp_addr,int(d*10.0))
+       
+        #display updated setpoints in status bar
+        self.statusbar.showMessage(f"Setpoints (C): {a}, {b}, {c}, {d}")
+        
+    def RRfunction(self):
+        # does same thing as SP function, only ramp rates are changed instead
+        
+        e = self.RRset222.value() 
+        f = self.RRset223.value()
+        g = self.RRset224.value()
+        h = self.RRset225.value()
+        
+        c222.write_single_register(rr1_addr,int(e*10.0))
+        c223.write_single_register(rr1_addr,int(f*10.0))
+        c224.write_single_register(rr1_addr,int(g*10.0))
+        c225.write_single_register(rr1_addr,int(h*10.0))
+       
+        self.statusbar.showMessage( #display updated ramp rates in status bar
+            f"Ramp rates (C/Min): {e}, {f}, {g}, {h}")
+        
+    # def zoomin222function(self, zvalue):
+    #     self.myFig222.zoomIn(zvalue)
+    #     self.statusbar.showMessage(f'Zoomed in Device 222 graph by {zvalue} units.')
+        
+    # def zoomout222function(self, zvalue):
+    #     self.myFig222.zoomOut(zvalue)
+    #     self.statusbar.showMessage(f'Zoomed out Device 222 graph by {zvalue} units.')
+        
+    # def zoomin223function(self, zvalue):
+    #     self.myFig223.zoomIn(zvalue)
+    #     self.statusbar.showMessage(f'Zoomed in Device 223 graph by {zvalue} units.')
+        
+    # def zoomout223function(self, zvalue):
+    #     self.myFig223.zoomOut(zvalue)
+    #     self.statusbar.showMessage(f'Zoomed out Device 223 graph by {zvalue} units.')
+    
+    # def zoomin224function(self, zvalue):
+    #     self.myFig224.zoomIn(zvalue)
+    #     self.statusbar.showMessage(f'Zoomed in Device 224 graph by {zvalue} units.')
+        
+    # def zoomout224function(self, zvalue):
+    #     self.myFig224.zoomOut(zvalue)
+    #     self.statusbar.showMessage(f'Zoomed out Device 224 graph by {zvalue} units.')
+    
+    # def zoomin225function(self, zvalue):
+    #     self.myFig225.zoomIn(zvalue)
+    #     self.statusbar.showMessage(f'Zoomed in Device 225 graph by {zvalue} units.')
+        
+    # def zoomout225function(self, zvalue):
+    #     self.myFig225.zoomOut(zvalue)
+    #     self.statusbar.showMessage(f'Zoomed out Device 225 graph by {zvalue} units.')
+
+app = QtWidgets.QApplication(sys.argv)
+Window = MainWindow()
+Window.setWindowTitle('Eurotherm Plot/Read & Write Window')
+Window.show()
+sys.exit(app.exec_()) 
