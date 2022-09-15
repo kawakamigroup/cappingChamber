@@ -29,6 +29,7 @@ from functools import partial
 
 from datetime import date 
 #from scanf import scanf
+from pyModbusTCP.client import ModbusClient
 
 #import pygame
 
@@ -53,7 +54,6 @@ class MainWindow(QMainWindow):
 
         #Connect to shutter control box
         #self.shutterBoxConnection.clicked.connect(self.boxConnect_function)
-
         #connect shutter buttons to a function
         for i in range(1,5):
             print(i)
@@ -68,8 +68,10 @@ class MainWindow(QMainWindow):
         
         self.cellsTableWidget.cellChanged.connect(self.cellTableChange_function)
         
-        self.cells = []
-        self.initCellTable()
+        self.cellConfigs = []
+        self.tblCells = []
+        self.readConfig()
+        self.eurothermInit()
         #self.initRecipeCommandList()
         
         self.addStepPushButton.clicked.connect(self.addRecipeStep_function)
@@ -84,53 +86,82 @@ class MainWindow(QMainWindow):
     #@QtCore.pyqtSlot() this decoration prevents checked state (boolean)
                         #from being passed to function
                         #not sure why
-    def initCellTable(self):
-        # initialize table values
-        # all int set as -1 in ui file
-        # need to get readings from eurotherms
-        # materials set as "Cell#"
-        # read config file to get materials and cell type and temp limits?
+    
+    def eurothermInit(self):
+        # Connect to Eurotherms
+        self.statusbar.showMessage("Connecting to Eurotherms")
+        euros = []
+        for cell in self.cellConfigs:
+            euros.append({"Material":cell['Material'],
+                          "Addr":cell['EurothermAddr'],
+                          "Connection":ModbusClient(host=cell['EurothermAddr'], port=502, auto_open=True)
+                          })      
+        pv_addr = 289 # temp reading (degC)
+        sp_addr = 2 # temp setpoint (degC)
+        wo_addr = 4 #working output power (%)
+        rr1_addr = 1282 # ramp rate (degC/min)
+        cjc_temp_addr = 215
+        MVin_addr = 202
+        
+        
+        
+        
+        # close connections
+        for euro in euros:
+            cellNum0 = euros.index(euro)
+            temp = euro['Connection'].read_holding_registers(pv_addr,1)[0]/10.0
+            setPoint = euro['Connection'].read_holding_registers(sp_addr,1)[0]/10.0
+            output = euro['Connection'].read_holding_registers(wo_addr,1)[0]/10.0
+            rampRate = euro['Connection'].read_holding_registers(rr1_addr,1)[0]/10.0
+            self.cellsTableWidget.item(cellNum0,1).setText(str(temp))
+            self.cellsTableWidget.item(cellNum0,3).setText(str(setPoint))
+            self.cellsTableWidget.item(cellNum0,4).setText(str(rampRate))
+            # print(euro['Connection'].read_holding_registers(pv_addr,1)[0]/10.0)
+            # print()
+            euro['Connection'].close()
+    
+    def readConfig(self):
+        # read configuration file
+        # all int settings table are set as -1 in ui file
+        # if table reads -1 anywhere then config file is not
+        # loading as expected. Formatting of config file matters
+        # read config file to get materials, cell type, temp
+        # limits, and eurotherm IP addr. Store in a list of dicts
         rt = 20
         ramp = 25
-        
+        # open and read file
         with open("config.txt") as f:
             lines = f.readlines()
+        #empty list and dict
         cells1 = []
         cell = {}
-        columns = []
-        colNum = self.cellsTableWidget.columnCount()
-        
-        for c in range(colNum):
-            columns.append(self.cellsTableWidget.horizontalHeaderItem(c).text())
-        print(columns)
+        # get info out of config file and make a dict for each cell
         for line in lines:
-            item = ""
             if "Cell" in line:
-                cell = {}   
+                cell = {}
             elif "}" in line:
-                cells1.append(cell)    
-            
-            for col in columns:
-                if col in line:
-                    find = line.find(":")
-                    item = line[find+1:].strip("\n ")
-                    print("found", col, item)
-                    cell.update({col:item})
-                    print(cell)
-                elif col != "Material":
-                    item = rt
-                    cell.update({col:item})
-        #print(cells)
-        self.cells = cells1
+                cells1.append(cell)
+            else:
+                colon = line.find(":")
+                key = line[:colon].strip("\n ")
+                item = line[colon+1:].strip("\n ")
+                cell.update({key:item})
+        # pass list of cells to main variable
+        self.cellConfigs = cells1
+        print(self.cellConfigs)
+        print(self.cellsTableWidget.horizontalHeaderItem(0).text())
+        # iterate through list and assign material names in settings table
+        # and change the shutter button names to the material name
         for c in cells1:
-            #print(cells.index(c))
-            for col in columns:    
-                self.cellsTableWidget.item(cells1.index(c), columns.index(col)).setText(str(c[col]))
-            name = cells1.index(c)+1
-            btn = self.findChild(QPushButton, f"shutter{name}PushButton")
-            btn.setText(c["Material"])
-        #print(self.cellsTableWidget.horizontalHeaderItem(2).text())
-        
+            cellNum = cells1.index(c)+1
+            btn = self.findChild(QPushButton, f"shutter{cellNum}PushButton")
+            btn.setText(c['Material'])
+            self.cellsTableWidget.item(cellNum-1,0).setText(c['Material'])
+    
+    def initTable():
+        pass
+    
+    
     def initRecipeCommandList(self):
         with open("commands.txt") as f:
             lines = f.readlines()
@@ -173,7 +204,7 @@ class MainWindow(QMainWindow):
         
         if col > 0:
             try:
-                value = int(value)
+                value = float(value)
                 if value > 0:
                     self.cells[row][head] = value
                     self.cellsTableWidget.item(row, col).setText(str(self.cells[row][head]))

@@ -3,25 +3,26 @@ Material: Empty1
 Type: Knudsen
 Min: 0
 Max: 1000
+EurothermAddr: 192.168.111.223
 }
-
 Cell 2: {
 Material: Empty2
 Type: Knudsen
 Min: 0
 Max: 1000
+EurothermAddr: 192.168.111.222
 }
-
 Cell 3: {
 Material: Empty3
 Type: Knudsen
 Min: 0
 Max: 1000
+EurothermAddr: 192.168.111.224
 }
-
 Cell 4: {
 Material: Empty4
 Type: Knudsen
 Min: 0
 Max: 1000
+EurothermAddr: 192.168.111.225
 }
