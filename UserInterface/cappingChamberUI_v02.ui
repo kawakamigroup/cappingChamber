@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tabOneMain">
      <attribute name="title">
@@ -35,7 +35,7 @@
        <rect>
         <x>100</x>
         <y>280</y>
-        <width>331</width>
+        <width>364</width>
         <height>133</height>
        </rect>
       </property>
@@ -308,9 +308,15 @@
        <rect>
         <x>60</x>
         <y>170</y>
-        <width>631</width>
-        <height>191</height>
+        <width>741</width>
+        <height>151</height>
        </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -318,10 +324,46 @@
       <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustIgnored</enum>
+      </property>
+      <property name="alternatingRowColors">
+       <bool>false</bool>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
       <property name="rowCount">
        <number>4</number>
       </property>
+      <attribute name="horizontalHeaderVisible">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderCascadingSectionResizes">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>122</number>
+      </attribute>
+      <attribute name="horizontalHeaderHighlightSections">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>40</number>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>false</bool>
+      </attribute>
       <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderCascadingSectionResizes">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderStretchLastSection">
        <bool>false</bool>
       </attribute>
       <row/>
@@ -332,25 +374,48 @@
        <property name="text">
         <string>Material</string>
        </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Temperature</string>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>WorkingSetpoint</string>
+        <string>Temperature (°C)</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Setpoint</string>
+        <string>WorkingSetpoint (°C)</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Ramp</string>
+        <string>Setpoint (°C)</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Ramp (°C/min)</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>WorkingOutput (%)</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
        </property>
       </column>
       <item row="0" column="0">
@@ -361,7 +426,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="0" column="1">
@@ -372,7 +437,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="0" column="2">
@@ -383,7 +448,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="0" column="3">
@@ -393,6 +458,9 @@
        <property name="textAlignment">
         <set>AlignCenter</set>
        </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
+       </property>
       </item>
       <item row="0" column="4">
        <property name="text">
@@ -400,6 +468,20 @@
        </property>
        <property name="textAlignment">
         <set>AlignCenter</set>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
+       </property>
+      </item>
+      <item row="0" column="5">
+       <property name="text">
+        <string>-1</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
        </property>
       </item>
       <item row="1" column="0">
@@ -410,7 +492,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="1" column="1">
@@ -421,7 +503,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="1" column="2">
@@ -432,7 +514,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="1" column="3">
@@ -442,6 +524,9 @@
        <property name="textAlignment">
         <set>AlignCenter</set>
        </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
+       </property>
       </item>
       <item row="1" column="4">
        <property name="text">
@@ -449,6 +534,20 @@
        </property>
        <property name="textAlignment">
         <set>AlignCenter</set>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
+       </property>
+      </item>
+      <item row="1" column="5">
+       <property name="text">
+        <string>-1</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
        </property>
       </item>
       <item row="2" column="0">
@@ -459,7 +558,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="2" column="1">
@@ -470,7 +569,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="2" column="2">
@@ -481,7 +580,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="2" column="3">
@@ -491,6 +590,9 @@
        <property name="textAlignment">
         <set>AlignCenter</set>
        </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
+       </property>
       </item>
       <item row="2" column="4">
        <property name="text">
@@ -498,6 +600,20 @@
        </property>
        <property name="textAlignment">
         <set>AlignCenter</set>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
+       </property>
+      </item>
+      <item row="2" column="5">
+       <property name="text">
+        <string>-1</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
        </property>
       </item>
       <item row="3" column="0">
@@ -508,7 +624,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="3" column="1">
@@ -519,7 +635,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="3" column="2">
@@ -530,7 +646,7 @@
         <set>AlignCenter</set>
        </property>
        <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+        <set>ItemIsEnabled</set>
        </property>
       </item>
       <item row="3" column="3">
@@ -540,6 +656,9 @@
        <property name="textAlignment">
         <set>AlignCenter</set>
        </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
+       </property>
       </item>
       <item row="3" column="4">
        <property name="text">
@@ -547,6 +666,20 @@
        </property>
        <property name="textAlignment">
         <set>AlignCenter</set>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
+       </property>
+      </item>
+      <item row="3" column="5">
+       <property name="text">
+        <string>-1</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEditable|ItemIsEnabled</set>
        </property>
       </item>
      </widget>
@@ -641,7 +774,7 @@
      <x>0</x>
      <y>0</y>
      <width>1277</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
